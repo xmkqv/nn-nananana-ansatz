@@ -1,21 +1,15 @@
 from pathlib import Path
 from pydantic import BaseModel, Field
 from rich import print
-import random
 from uuid import uuid4
 import os
-
-def gen_rnd(seed: int = None, n_char: int = 10) -> str:
-	""" generate random string of length """
-	seed = seed or os.environ.get('seed', 0)
-	return uuid4().hex[:n_char]
+from .utils import gen_rnd
 
 class Paths(BaseModel):
 
 	project: str
 	exp_name: str
 	run_name: Path				= Path('./run.py')
-	env_file: str 				= Path(__file__).parent / '.env'
 
 	lo_ve_path: 		str 	= '' # for LOad & saVE -> lo_ve
 	exp_id: 			str 	= Field(default_factory= lambda: gen_rnd()) # gen random id for wandb tag !info:default_factory

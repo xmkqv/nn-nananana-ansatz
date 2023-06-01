@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any, Callable
 import subprocess
 
-from uuid import UUID
 from time import time
 from typing import Callable
 from functools import partial

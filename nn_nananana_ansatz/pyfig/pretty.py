@@ -17,30 +17,30 @@ from enum import Enum
 '''
 
 class Format(BaseModel):
-    bold: Optional[bool] = False
-    italic: Optional[bool] = False
-    underline: Optional[bool] = False
-    blink: Optional[bool] = False
-    reverse: Optional[bool] = False
-    
+	bold: Optional[bool] = False
+	italic: Optional[bool] = False
+	underline: Optional[bool] = False
+	blink: Optional[bool] = False
+	reverse: Optional[bool] = False
+	
 class Colors(str, Enum):
-    """Rich colors."""
-    black = "black"
-    red = "red"
-    green = "green"
-    yellow = "yellow"
-    blue = "blue"
-    magenta = "magenta"
-    cyan = "cyan"
-    white = "white"
-    bright_black = "bright_black"
-    bright_red = "bright_red"
-    bright_green = "bright_green"
-    bright_yellow = "bright_yellow"
-    bright_blue = "bright_blue"
-    bright_magenta = "bright_magenta"
-    bright_cyan = "bright_cyan"
-    bright_white = "bright_white"
+	"""Rich colors."""
+	black = "black"
+	red = "red"
+	green = "green"
+	yellow = "yellow"
+	blue = "blue"
+	magenta = "magenta"
+	cyan = "cyan"
+	white = "white"
+	bright_black = "bright_black"
+	bright_red = "bright_red"
+	bright_green = "bright_green"
+	bright_yellow = "bright_yellow"
+	bright_blue = "bright_blue"
+	bright_magenta = "bright_magenta"
+	bright_cyan = "bright_cyan"
+	bright_white = "bright_white"
 
 
 def style(
@@ -50,7 +50,7 @@ def style(
 	blink: bool = False,
 ):
 	return Text(string, # redundant, still educational
-	    style=Style(
+		style=Style(
 			color=color, 
 			bold=bold, 
 			blink=blink
@@ -71,15 +71,15 @@ def get_light_colors(mode='rgb'):
 	return rgb if mode=='rgb' else [c.name for c in rgb]
 
 def print_table(lines: list[list[str]]) -> table.Table:
-    """ Generate a rich table """
-    lines = iter(lines)
-    colors = list(get_light_colors(mode= 'name'))
-    info = table.Table(*[
-    	table.Column(header= col, justify= "left", style= colors[i]) 
-    	for i, col in enumerate(next(lines))
-    ])
-    [info.add_row(*l) for l in lines]
-    return info
+	""" Generate a rich table """
+	lines = iter(lines)
+	colors = list(get_light_colors(mode= 'name'))
+	info = table.Table(*[
+		table.Column(header= col, justify= "left", style= colors[i]) 
+		for i, col in enumerate(next(lines))
+	])
+	[info.add_row(*l) for l in lines]
+	return info
 
 from rich.filesize import decimal
 from rich.markup import escape
@@ -122,7 +122,6 @@ def walk_directory(dir_path: Path, tree: Tree, ignore= []) -> None:
 			tree.add(Text(icon) + name)
 
 from rich.panel import Panel
-from rich.console import Console
 
 def print_tree(directory: Path, ignore: list[str]=[]) -> None:
 	print('Ignoring: ', ignore)
@@ -143,7 +142,6 @@ def print_tree(directory: Path, ignore: list[str]=[]) -> None:
 		title="Directory Tree",
 		style= Style(bgcolor='black', color='white'),
 	)
-	console = Console()
 	print(panel)
 
 ### needs testing 
@@ -152,24 +150,24 @@ from rich.style import Style
 
 THEMES = dict(
 dark = Theme(
-        styles={
-            "info": "dim cyan",
-            "warning": "bold magenta",
-            "danger": "bold red",
-        },
-    ),
+		styles={
+			"info": "dim cyan",
+			"warning": "bold magenta",
+			"danger": "bold red",
+		},
+	),
 light = Theme(
-        styles={
-            "info": Style(color="bright_green", bold=True),
-            "warning": Style(color="bright_magenta", bold=True),
-            "danger": Style(color="light_slate_blue", bold=True, underline=True, italic=True),
-        },
-    ),
+		styles={
+			"info": Style(color="bright_green", bold=True),
+			"warning": Style(color="bright_magenta", bold=True),
+			"danger": Style(color="light_slate_blue", bold=True, underline=True, italic=True),
+		},
+	),
 mono = Theme(
-        styles={
-            "info": "italic",
-            "warning": "bold",
-            "danger": "reverse bold",
-        },
-    ),
+		styles={
+			"info": "italic",
+			"warning": "bold",
+			"danger": "reverse bold",
+		},
+	),
 )

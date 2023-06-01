@@ -640,48 +640,7 @@ class Scf:
 		return system
 
 
-def gaussian_clip(g: Tensor, cutoff: float= 2.):
-	raise NotImplementedError
-	mean, std = g.mean(), g.std() or 1e-10 # in case the std of the grads is near zero
 
-	cen  = g - mean #   -----|
-	cen_abs = cen.abs() # |-----
-
-	g_diff 		= (cen_abs - std).clamp_min(0.)  # all the abs grads minus the max clip
-	cut_this 	= torch.randn_like(g).abs() * g_diff/2.  # random noise times the difference
-	g_new 		= (cen - cut_this).clamp_min(std) * cen.sign() + mean  # the new grads
-	return dict(g= g_new, g_og= g)
-
-
-@torch.no_grad()
-def update_grads(
-	model: nn.Module, 
-	v_d: dict,
-	step: int
-):
-	grads = v_d.setdefault('grads', {})
-
-	for i, (k, p) in enumerate(model.named_parameters()):
-
-		g = grads.get(k)
-		if g is None: 
-			g = torch.zeros_like(p)
-
-		# torch.nn.utils.clip_grad_norm_(parameters=g, max_norm=10, norm_type=2.0)
-
-		if p.grad is None:
-			p.grad = torch.zeros_like(p)
-		else:
-			p.grad.copy_(g)
-		
-		v_d['grads'][k] = g
-
-	return v_d
-
-@torch.no_grad()
-def update_params(model: nn.Module, opt: torch.optim.Optimizer, clip_grad_norm: float= 1.):
-	# torch.nn.utils.clip_grad_norm_(model.parameters(), clip_grad_norm)
-	opt.step()
 
 def loss_fn(
 	model:torch.nn.Module,
