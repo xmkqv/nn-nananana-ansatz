@@ -1,0 +1,13 @@
+
+.myclass {
+	color: #000000; /* this is the default color value */
+}
+
+/* place your cursor in the color value and press "Ctrl + Shift + P" to open the color picker */
+.myclass {
+color: #7FDBFF; /* this is the selected color */
+}
+
+.myclass {
+color: #da8af9; /* this is the selected color */
+}
