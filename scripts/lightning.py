@@ -90,3 +90,65 @@ class Model(nn.Module):
 		for rate, params in zip(self.ema_rate, self.ema_params):
 			update_ema(params, self.master_params, rate=rate)
 
+
+
+# 
+
+
+import torch as th
+from torch.utils.data import DataLoader, Dataset, random_split
+from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.loggers import WandbLogger
+import pytorch_lightning as pl
+
+from accelerate import Accelerator
+
+import wandb
+
+from nn_nananana_ansatz.hwat import Ansatz as Model, Scf
+
+pl.seed_everything(c.seed)
+
+accelerator = Accelerator(
+    device_placement = True,  # Automatically places tensors on the proper device
+    fp16 = True,  # Enables automatic mixed precision training (AMP)
+    cpu=True,  # Forces the use of CPU even when GPUs are available
+    split_batches=True,  # Splits the batches on the CPU before sending them to the device
+    num_processes=1,  # Number of processes to use for distributed training (1 means no distributed training)
+    local_rank=0,  # Local rank of the process (for distributed training)
+)
+
+
+model = Model(c.modelcfg)
+
+wandb_logger = WandbLogger(
+    project		= c.paths.project,
+    log_model	= c.logger.log_model
+)
+
+wandb_logger.watch(model)
+
+checkpoint_callback = ModelCheckpoint(
+    dirpath				= c.model_save_path,
+    filename			= "model-{epoch:02d}-{val_loss:.2f}",
+    save_top_k			= 1,
+    monitor				= "val_loss",
+    mode				= "min",
+    save_weights_only	= True,
+    save_last			= True,
+    period				= c.checkpoint_frequency,
+    verbose				= True,
+)
+
+trainer = pl.Trainer(
+    max_epochs	= c.n_epoch,
+    accelerator	= accelerator,
+    logger		= wandb_logger,
+    callbacks	= [checkpoint_callback],
+    gpus		= th.cuda.device_count(),
+)
+
+trainer.fit(model, train_loader, val_loader)
+
+wandb.finish()
+

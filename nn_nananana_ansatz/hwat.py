@@ -58,7 +58,6 @@ class Ansatz(nn.Module):
 
 
 		super().__init__()
-  
 		ii.with_sign = with_sign      # return sign of wavefunction
 
 		ii.n_e: Final[int] = n_e      					# number of electrons
@@ -667,8 +666,6 @@ def update_grads(
 		if g is None: 
 			g = torch.zeros_like(p)
 
-		# torch.nn.utils.clip_grad_norm_(parameters=g, max_norm=10, norm_type=2.0)
-
 		if p.grad is None:
 			p.grad = torch.zeros_like(p)
 		else:
@@ -676,11 +673,9 @@ def update_grads(
 		
 		v_d['grads'][k] = g
 
-	return v_d
-
 @torch.no_grad()
 def update_params(model: nn.Module, opt: torch.optim.Optimizer, clip_grad_norm: float= 1.):
-	# torch.nn.utils.clip_grad_norm_(model.parameters(), clip_grad_norm)
+	torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=10, norm_type=2.0) # torch stuff: clip gradients
 	opt.step()
 
 def loss_fn(
@@ -689,7 +684,6 @@ def loss_fn(
 	model_fn: Callable,
 	system: dict,
 	ansatzcfg: Ansatzcfg,
-	**kw
 ):
 	v_d = {}
 
@@ -701,11 +695,11 @@ def loss_fn(
 		e_clip = torch.clip(e, min= e-5*e_mean_dist, max= e+5*e_mean_dist)
 		energy_center = (e_clip - e_clip.mean())
 
-		v_d |= dict(e= e, pe= pe, ke= ke)
+		v_d['energy'] = dict(e= e, pe= pe, ke= ke)
 
-	loss: Tensor = ((energy_center / system['a_z'].sum()) * model(data)).mean()
+	v_d['loss'] = ((energy_center / system['a_z'].sum()) * model(data)).mean()
 
-	return loss, dict(loss= loss.item(), **v_d)
+	return v_d
 
 def loss_fn_pretrain(
 	model: Ansatz,
@@ -724,7 +718,7 @@ def loss_fn_pretrain(
 		for o, mo in zip(orb_ud, m_orb_ud)
 	)
 	loss *= float(step / c.n_step)
-	return loss, dict(loss= loss.item())
+	return dict(loss= loss)
 
 
 def kl_div_loss(

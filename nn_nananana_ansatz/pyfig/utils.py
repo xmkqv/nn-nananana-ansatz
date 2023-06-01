@@ -183,12 +183,15 @@ def d_flatten_r(
 	""" recursively flatten a dict """
 	
 	items = items or {}
-
+	
+	if not isinstance(d, dict):
+		items[name] = d
+		return items
+	
 	for k, v in d.items():
 		k = (name + sep_head + k) if name else k
 		if isinstance(v, dict):
-			# dict is mutable (something about memory), therefore no return
-			d_flatten_r(v, name= k, sep_head= sep_head, sep= sep, items= items) 
+			items |= d_flatten_r(v, name= k, sep_head= sep_head, sep= sep, items= items) 
 		else:
 			items[k] = v
 	
