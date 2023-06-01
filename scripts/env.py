@@ -16,7 +16,7 @@ from pydantic import Field, BaseSettings, SecretStr
 from rich import print
 from typing import Optional
 
-env_file = (Path(__file__).parent / '.env').expanduser()
+env_file = (Path(__file__).parent / 'env.env').expanduser()
 print(f'env_file: {str(env_file)}')
 
 class Env(BaseSettings):
@@ -28,7 +28,6 @@ class Env(BaseSettings):
 	WANDB_ENTITY: Optional[str]
 	GITHUB_USER: Optional[str]
 	GITHUB_REPO: Optional[str]
-	GITHUB_TOKEN: Optional[SecretStr]
 
 	class Config:
 		env_file = env_file,
@@ -40,7 +39,7 @@ print(env)
 
 from dotenv import load_dotenv
 _ = load_dotenv(dotenv_path= env_file) # envs go to os.environ
-print('environ test: ' + str('GITHUB_TOKEN' in os.environ))
+print('environ test: ' + str('WANDB_ENTITY' in os.environ))
 
 from nn_nananana_ansatz.pyfig.log import create_logger
 level = os.environ.get('log_level', 'INFO')
